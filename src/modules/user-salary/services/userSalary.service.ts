@@ -104,7 +104,7 @@ export class UserSalaryService extends BaseService {
                 orderDirection = ORDER_DIRECTION.ASC,
             } = query;
             const _queryBuilder = this.userSalaryRepo
-                .createQueryBuilder('user')
+                .createQueryBuilder('userSalary')
                 .leftJoinAndSelect('userSalary.user', 'user');
             _queryBuilder.select([
                 ...userSelectAttributes,

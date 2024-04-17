@@ -97,14 +97,15 @@ export class UserController {
             }
             const user = await this.userService.createUser(body);
             await this.databaseService.recordUserLogging({
-                userId: 1,
-                action: USER_ACTION.DELETE,
-                module: AUDIT_LOG_MODULES.USER_SALARY,
+                createdBy: 1,
+                action: USER_ACTION.POST,
+                module: AUDIT_LOG_MODULES.USER,
                 oldValue: null,
                 newValue: {
                     ...user,
                 },
             });
+            return new SuccessResponse(user);
         } catch (error) {
             throw new InternalServerErrorException(error);
         }
@@ -117,8 +118,8 @@ export class UserController {
         body: UpdateUserDto,
     ) {
         try {
-            const user = await this.userService.getUserById(id);
-            if (!user) {
+            const existedUser = await this.userService.getUserById(id);
+            if (!existedUser) {
                 return new ErrorResponse(
                     HttpStatus.NOT_FOUND,
                     'User not found',
@@ -136,18 +137,19 @@ export class UserController {
                     [],
                 );
             }
-            await this.userService.updateUser(id, body);
+            const user = await this.userService.updateUser(id, body);
             await this.databaseService.recordUserLogging({
-                userId: 1,
-                action: USER_ACTION.DELETE,
-                module: AUDIT_LOG_MODULES.USER_SALARY,
+                createdBy: 1,
+                action: USER_ACTION.PATCH,
+                module: AUDIT_LOG_MODULES.USER,
                 oldValue: {
-                    ...user,
+                    ...existedUser,
                 },
                 newValue: {
                     ...user,
                 },
             });
+            return new SuccessResponse(user);
         } catch (error) {
             throw new InternalServerErrorException(error);
         }
@@ -167,9 +169,9 @@ export class UserController {
             // Assume loginUserId = 1
             await this.userService.deleteUser(id, 1);
             await this.databaseService.recordUserLogging({
-                userId: 1,
+                createdBy: 1,
                 action: USER_ACTION.DELETE,
-                module: AUDIT_LOG_MODULES.USER_SALARY,
+                module: AUDIT_LOG_MODULES.USER,
                 oldValue: {
                     ...user,
                 },

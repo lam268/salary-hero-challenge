@@ -13,11 +13,6 @@ export class AuditLog1686649813000 implements MigrationInterface {
                 columns: [
                     ...commonColumns,
                     {
-                        name: 'userId',
-                        type: 'int',
-                        isNullable: false,
-                    },
-                    {
                         name: 'module',
                         type: 'enum',
                         enum: Object.values(AUDIT_LOG_MODULES),

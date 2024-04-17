@@ -108,14 +108,15 @@ export class UserSalaryController {
             const userSalary =
                 await this.userSalaryService.createUserSalary(body);
             await this.databaseService.recordUserLogging({
-                userId: 1,
-                action: USER_ACTION.DELETE,
+                createdBy: 1,
+                action: USER_ACTION.POST,
                 module: AUDIT_LOG_MODULES.USER_SALARY,
                 oldValue: null,
                 newValue: {
                     ...userSalary,
                 },
             });
+            return new SuccessResponse(userSalary);
         } catch (error) {
             throw new InternalServerErrorException(error);
         }
@@ -131,9 +132,9 @@ export class UserSalaryController {
         body: UpdateUserSalaryDto,
     ) {
         try {
-            const userSalary =
+            const existedUserSalary =
                 await this.userSalaryService.getUserSalaryById(id);
-            if (!userSalary) {
+            if (!existedUserSalary) {
                 return new ErrorResponse(
                     HttpStatus.NOT_FOUND,
                     'User salary not found',
@@ -152,15 +153,22 @@ export class UserSalaryController {
                     [],
                 );
             }
+            const userSalary = await this.userSalaryService.updateUserSalary(
+                id,
+                body,
+            );
             await this.databaseService.recordUserLogging({
-                userId: 1,
-                action: USER_ACTION.DELETE,
+                createdBy: 1,
+                action: USER_ACTION.PATCH,
                 module: AUDIT_LOG_MODULES.USER_SALARY,
                 oldValue: {
+                    ...existedUserSalary,
+                },
+                newValue: {
                     ...userSalary,
                 },
-                newValue: {},
             });
+            return new SuccessResponse(userSalaryByUserId);
         } catch (error) {
             throw new InternalServerErrorException(error);
         }
@@ -180,7 +188,7 @@ export class UserSalaryController {
             }
             await this.userSalaryService.deleteUserSalary(userSalary, id, 1);
             await this.databaseService.recordUserLogging({
-                userId: 1,
+                createdBy: 1,
                 action: USER_ACTION.DELETE,
                 module: AUDIT_LOG_MODULES.USER_SALARY,
                 oldValue: {

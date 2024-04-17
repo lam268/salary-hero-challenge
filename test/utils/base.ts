@@ -6,7 +6,7 @@ import { AppModule } from '../../src/app.module';
 import { TestDBSetup } from './database-setup';
 import { TestRepo } from './repo';
 import { TestRequest } from './request';
-import { TestMigration } from './ migration';
+import { TestMigration } from './migration';
 
 export class TestBase {
     static app: INestApplication;

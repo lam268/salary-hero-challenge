@@ -1,6 +1,7 @@
 export const userSelectAttributes = [
     'user.id',
     'user.fullName',
+    'user.email',
     'user.balance',
 ];
 
