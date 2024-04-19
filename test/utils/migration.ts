@@ -14,11 +14,9 @@ const datasource = new DataSource({
     migrations: ['database/migrations/**/*{.ts,.js}'],
 });
 
-datasource.initialize();
-export default datasource;
-
 export class TestMigration {
     static runMigration() {
+        datasource.initialize();
         (async () => {
             await datasource.runMigrations({
                 transaction: 'none',

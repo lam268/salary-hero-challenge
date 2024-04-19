@@ -16,7 +16,7 @@ import {
     userSalarySelectAttributes,
 } from '../userSalary.constant';
 import { UserSalary } from '../../../entities/userSalary.entity';
-import { AuditLog } from 'src/entities/auditLog.entity';
+import { AuditLog } from '../../../entities/auditLog.entity';
 import dayjs from 'dayjs';
 
 dotenv.config();

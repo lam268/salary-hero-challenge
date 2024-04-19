@@ -7,15 +7,19 @@ import {
 export class TestDBSetup {
     static db: StartedPostgreSqlContainer;
     static createDatabase = async () => {
-        this.db = await new PostgreSqlContainer('salary-hero')
-            .withExposedPorts({
-                container: TestConfig.dbExposedPort,
-                host: TestConfig.dbHostPort,
-            })
-            .withDatabase(TestConfig.dbName)
-            .withUsername(TestConfig.dbUserName)
-            .withPassword(TestConfig.dbPassword)
-            .start();
+        try {
+            this.db = await new PostgreSqlContainer('postgres')
+                .withExposedPorts({
+                    container: TestConfig.dbExposedPort,
+                    host: TestConfig.dbHostPort,
+                })
+                .withDatabase(TestConfig.dbName)
+                .withUsername(TestConfig.dbUserName)
+                .withPassword(TestConfig.dbPassword)
+                .start();
+        } catch (error) {
+            console.log(error);
+        }
     };
     static stopDatabase = async () => {
         await this.db.stop();

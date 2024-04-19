@@ -34,12 +34,14 @@ import {
 } from './dto/request/update.request.dto';
 import { UserSalaryList } from './dto/response/api.response.dto';
 import { CreateUserSalaryDto } from './dto/request/create.request.dto';
+import { SendUpdateUserBalanceJob } from './cron-jobs/updateUserBalance';
 
 @Controller('user-salary')
 export class UserSalaryController {
     constructor(
         private userSalaryService: UserSalaryService,
         private databaseService: DatabaseService,
+        private updateBalanceJobService: SendUpdateUserBalanceJob,
     ) {}
 
     @Get()
@@ -81,6 +83,7 @@ export class UserSalaryController {
     @Post('trigger-update-user-balance')
     async triggerUpdateUserBalance() {
         try {
+            await this.updateBalanceJobService.updateUserBalance();
             return new SuccessResponse();
         } catch (error) {
             throw new InternalServerErrorException(error);
