@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     InternalServerErrorException,
     Param,
     ParseIntPipe,
@@ -91,6 +92,7 @@ export class UserSalaryController {
     }
 
     @Post()
+    @HttpCode(HttpStatus.OK)
     async createUserSalary(
         @Body(
             new TrimObjectPipe(),

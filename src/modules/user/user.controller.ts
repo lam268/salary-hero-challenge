@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     InternalServerErrorException,
     Param,
     ParseIntPipe,
@@ -80,6 +81,7 @@ export class UserController {
     }
 
     @Post()
+    @HttpCode(HttpStatus.OK)
     async createUser(
         @Body(new TrimObjectPipe(), new JoiValidationPipe(CreateUserSchema))
         body: CreateUserDto,
