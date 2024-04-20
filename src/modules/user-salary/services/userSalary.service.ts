@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../../common/base/BaseService';
 import { DatabaseService } from '../../../common/services/database.service';
 import { UserSalary } from '../../../entities/userSalary.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import {
     UserSalaryOrderBy,
     userSalarySelectAttributes,
@@ -19,18 +19,17 @@ import {
 } from '../dto/response/api.response.dto';
 import { CreateUserSalaryDto } from '../dto/request/create.request.dto';
 import { UpdateUserSalaryDto } from '../dto/request/update.request.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserSalaryService extends BaseService {
     constructor(
         protected dataSource: DataSource,
         readonly databaseService: DatabaseService,
+        @InjectRepository(UserSalary)
+        private readonly userSalaryRepo: Repository<UserSalary>,
     ) {
         super();
-    }
-
-    get userSalaryRepo() {
-        return this.dataSource.getRepository(UserSalary);
     }
 
     async getUserSalaryById(id: number) {

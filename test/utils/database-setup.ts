@@ -18,7 +18,7 @@ export class TestDBSetup {
                 .withPassword(TestConfig.dbPassword)
                 .start();
         } catch (error) {
-            console.log(error);
+            console.log('Error in database setup', error);
         }
     };
     static stopDatabase = async () => {

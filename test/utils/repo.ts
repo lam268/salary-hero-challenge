@@ -8,6 +8,7 @@ import { TABLE_NAME } from '../../database/database.constant';
 import { User } from '../../src/entities/user.entity';
 import { UserSalary } from '../../src/entities/userSalary.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
+import { AuditLog } from '../../src/entities/auditLog.entity';
 
 export class TestRepo {
     // initialize all necessary repository here
@@ -15,10 +16,12 @@ export class TestRepo {
     static entityManager: EntityManager;
     static userRepo: Repository<User>;
     static userSalaryRepo: Repository<UserSalary>;
+    static auditLogRepo: Repository<AuditLog>;
 
     static initRepo = async (app: INestApplication) => {
         this.dataSource = await app.get(getDataSourceToken());
         this.entityManager = await app.get(getEntityManagerToken());
+        this.auditLogRepo = await app.get(getRepositoryToken(AuditLog));
         this.userRepo = await app.get(getRepositoryToken(User));
         this.userSalaryRepo = await app.get(getRepositoryToken(UserSalary));
     };

@@ -1,5 +1,5 @@
-import request from 'supertest'
-import { INestApplication } from "@nestjs/common";
+import * as request from 'supertest';
+import { INestApplication } from '@nestjs/common';
 
 export class TestRequest {
     static httpServer;

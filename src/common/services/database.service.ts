@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { AuditLog } from '../../entities/auditLog.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UserLoggingDto } from '../dto/user.logging.dto';
 
 @Injectable()
@@ -9,6 +9,8 @@ export class DatabaseService {
     constructor(
         @InjectDataSource()
         private dataSource: DataSource,
+        @InjectRepository(AuditLog)
+        private auditLogRepo: Repository<AuditLog>,
     ) {}
 
     async recordUserLogging(data: UserLoggingDto) {

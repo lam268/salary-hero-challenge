@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
+import dayjs from 'dayjs';
 import * as dotenv from 'dotenv';
-import { createWinstonLogger } from '../../../common/services/winston.service';
+import { DataSource } from 'typeorm';
 import {
     AUDIT_LOG_MODULES,
     TIMEZONE_NAME_DEFAULT,
     USER_ACTION,
 } from '../../../common/common.constant';
-import { DataSource } from 'typeorm';
+import { createWinstonLogger } from '../../../common/services/winston.service';
+import { AuditLog } from '../../../entities/auditLog.entity';
 import { User } from '../../../entities/user.entity';
+import { UserSalary } from '../../../entities/userSalary.entity';
 import { userSelectAttributes } from '../../../modules/user/user.constant';
 import {
     USER_SALARY_TYPE,
     userSalarySelectAttributes,
 } from '../userSalary.constant';
-import { UserSalary } from '../../../entities/userSalary.entity';
-import { AuditLog } from '../../../entities/auditLog.entity';
-import dayjs from 'dayjs';
 
 dotenv.config();
 
@@ -26,10 +25,7 @@ const CRON_JOB_UPDATE_USER_BALANCE =
 
 @Injectable()
 export class SendUpdateUserBalanceJob {
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly dataSource: DataSource,
-    ) {
+    constructor(private readonly dataSource: DataSource) {
         // eslint-disable-next-line prettier/prettier
     }
     private readonly logger = createWinstonLogger(

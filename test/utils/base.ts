@@ -37,7 +37,7 @@ export class TestBase {
 
     static close = async () => {
         console.log('Tearing down test environment');
-        await TestRepo.clearAllRepo();
+        // await TestRepo.clearAllRepo();
         jest.clearAllMocks();
         await this.app.close();
         await TestDBSetup.stopDatabase();

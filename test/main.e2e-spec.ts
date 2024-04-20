@@ -11,6 +11,7 @@ AppE2eTest.runTests();
 afterEach(async () => {
     await TestRepo.clearAllRepo();
 });
+
 afterAll(async () => {
     await TestBase.close();
 });

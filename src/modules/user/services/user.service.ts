@@ -1,30 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../../entities/user.entity';
-import { Brackets, DataSource, Like } from 'typeorm';
-import { UserList, UserResponseDto } from '../dto/response/api.response.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Brackets, Like, Repository } from 'typeorm';
 import { BaseService } from '../../../common/base/BaseService';
-import { UserOrderBy, userSelectAttributes } from '../user.constant';
-import { UpdateUserDto } from '../dto/request/update.request.dto';
 import {
     ORDER_DIRECTION,
     TYPE_ORM_ORDER_DIRECTION,
 } from '../../../common/common.constant';
-import { UserListQueryStringDto } from '../dto/request/get.request.dto';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { CreateUserDto } from '../dto/request/create.request.dto';
+import { User } from '../../../entities/user.entity';
 import { userSalarySelectAttributes } from '../../../modules/user-salary/userSalary.constant';
+import { CreateUserDto } from '../dto/request/create.request.dto';
+import { UserListQueryStringDto } from '../dto/request/get.request.dto';
+import { UpdateUserDto } from '../dto/request/update.request.dto';
+import { UserList, UserResponseDto } from '../dto/response/api.response.dto';
+import { UserOrderBy, userSelectAttributes } from '../user.constant';
 
 @Injectable()
 export class UserService extends BaseService {
     constructor(
-        @InjectDataSource()
-        private readonly dataSource: DataSource,
+        @InjectRepository(User)
+        private readonly userRepo: Repository<User>,
     ) {
         super();
-    }
-
-    get userRepo() {
-        return this.dataSource.getRepository(User);
     }
 
     async getUsers(query: UserListQueryStringDto): Promise<UserList> {
