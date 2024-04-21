@@ -87,6 +87,7 @@ export class SendUpdateUserBalanceJob {
                 if (userSalary) {
                     const ratePerUnit = userSalary.ratePerUnit;
                     const salaryType = userSalary.type;
+                    // Case: Given monthly payments, the user must work daily throughout the month.
                     if (ratePerUnit > 0) {
                         balance +=
                             (salaryType === USER_SALARY_TYPE.DAILY
