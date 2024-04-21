@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import * as dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import {
     AUDIT_LOG_MODULES,
+    DATE_TIME_FORMAT,
     TIMEZONE_NAME_DEFAULT,
     USER_ACTION,
 } from '../../../common/common.constant';
@@ -49,7 +50,7 @@ export class SendUpdateUserBalanceJob {
         await queryRunner.connect();
         await queryRunner.startTransaction();
         try {
-            const timeNow = Date.now();
+            const timeNow = dayjs();
             const users = await this.userRepo
                 .createQueryBuilder('user')
                 .leftJoinAndSelect('user.userSalary', 'userSalary')
@@ -62,24 +63,37 @@ export class SendUpdateUserBalanceJob {
                         `userSalary.lastTimeCronJobUpdated is null`,
                     );
                     queryBuilder.orWhere(
-                        `userSalary.lastTimeCronJobUpdated is null`,
+                        `DATE(userSalary.lastTimeCronJobUpdated) < :today`,
+                        {
+                            today: dayjs().format(
+                                DATE_TIME_FORMAT.YYYY_MM_DD_HYPHEN,
+                            ),
+                        },
                     );
                 })
                 .getMany();
             const updateUsers = [];
             const updateUserSalaries = [];
             users.forEach((user) => {
-                let balance = user.balance;
+                let balance = Number(user.balance);
                 const userSalary = user.userSalary;
-                const dayInMonth = Number(dayjs(timeNow).daysInMonth());
+                const dayInMonth = Number(timeNow.daysInMonth());
+                const days = Math.abs(
+                    dayjs().diff(
+                        dayjs(userSalary.lastTimeCronJobUpdated),
+                        'days',
+                    ),
+                );
                 if (userSalary) {
                     const ratePerUnit = userSalary.ratePerUnit;
                     const salaryType = userSalary.type;
                     if (ratePerUnit > 0) {
                         balance +=
-                            salaryType === USER_SALARY_TYPE.DAILY
-                                ? ratePerUnit
-                                : Number((ratePerUnit / dayInMonth).toFixed(3));
+                            (salaryType === USER_SALARY_TYPE.DAILY
+                                ? Number(ratePerUnit)
+                                : Number(
+                                      (ratePerUnit / dayInMonth).toFixed(3),
+                                  )) * days;
                     }
                     updateUsers.push({
                         id: user.id,
@@ -92,23 +106,26 @@ export class SendUpdateUserBalanceJob {
                         type: userSalary.type,
                         ratePerUnit: userSalary.ratePerUnit,
                         userId: user.id,
-                        lastTimeCronJobUpdated: timeNow,
+                        lastTimeCronJobUpdated: timeNow.format(
+                            DATE_TIME_FORMAT.YYYY_MM_DD_HYPHEN_HH_MM_SS_COLON,
+                        ),
                     });
                 }
             });
-            await queryRunner.manager
-                .createQueryBuilder()
-                .insert()
-                .into(User)
-                .values({ ...updateUsers })
-                .execute();
-            await queryRunner.manager
-                .createQueryBuilder()
-                .insert()
-                .into(UserSalary)
-                .values({ ...updateUserSalaries })
-                .execute();
-            const logginData = {
+            const userPromise = updateUsers.map((user) => {
+                return queryRunner.manager.getRepository(User).update(user.id, {
+                    ...user,
+                });
+            });
+            const userSalaryPromise = updateUserSalaries.map((userSalary) => {
+                return queryRunner.manager
+                    .getRepository(UserSalary)
+                    .update(userSalary.id, {
+                        ...userSalary,
+                    });
+            });
+            await Promise.all([userPromise, userSalaryPromise]);
+            const loggingData = {
                 action: USER_ACTION.CRON_JOB,
                 module: AUDIT_LOG_MODULES.USER,
                 oldValue: {
@@ -121,7 +138,7 @@ export class SendUpdateUserBalanceJob {
                 createdBy: 1,
             } as unknown as AuditLog;
             await queryRunner.manager.getRepository(AuditLog).save({
-                ...logginData,
+                ...loggingData,
             });
         } catch (error) {
             await queryRunner.rollbackTransaction();

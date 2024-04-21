@@ -1,5 +1,5 @@
-import { TABLE_NAME } from '../../database/database.constant';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TABLE_NAME } from '../../database/database.constant';
 import { BaseEntity } from './base.entity';
 import { UserSalary } from './userSalary.entity';
 

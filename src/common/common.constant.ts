@@ -62,3 +62,8 @@ export const MIN_PAGE = 1;
 export const MAX_PAGE_SIZE = 10000;
 export const MAX_PAGE = 10000;
 export const INPUT_TEXT_MAX_LENGTH = 255;
+
+export enum DATE_TIME_FORMAT {
+    YYYY_MM_DD_HYPHEN_HH_MM_SS_COLON = 'YYYY-MM-DD HH:mm:ss',
+    YYYY_MM_DD_HYPHEN = 'YYYY-MM-DD',
+}

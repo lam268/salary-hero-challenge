@@ -82,6 +82,7 @@ export class UserSalaryController {
     }
 
     @Post('trigger-update-user-balance')
+    @HttpCode(HttpStatus.OK)
     async triggerUpdateUserBalance() {
         try {
             await this.updateBalanceJobService.updateUserBalance();

@@ -26,11 +26,6 @@ export class TestRepo {
         this.userSalaryRepo = await app.get(getRepositoryToken(UserSalary));
     };
 
-    static clearAllRepo = async () => {
-        await this.userSalaryRepo.clear();
-        await this.userRepo.clear();
-    };
-
     static setSequenceIdOfTable = async (
         tableName: TABLE_NAME,
         currentValue: number,
@@ -46,5 +41,17 @@ export class TestRepo {
             `ALTER TABLE ${oldName}
             RENAME TO ${newName};`,
         );
+    };
+
+    static clearAllRepo = async () => {
+        await this.userSalaryRepo.clear();
+        await this.userRepo.clear();
+        await this.auditLogRepo.clear();
+    };
+
+    static resetPrimaryKey = async () => {
+        await this.setSequenceIdOfTable(TABLE_NAME.USER, 1);
+        await this.setSequenceIdOfTable(TABLE_NAME.USER_SALARY, 1);
+        await this.setSequenceIdOfTable(TABLE_NAME.AUDIT_LOG, 1);
     };
 }
